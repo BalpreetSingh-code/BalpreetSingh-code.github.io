@@ -1,257 +1,263 @@
-// Mobile Navigation Toggle
-const hamburger = document.querySelector('.hamburger');
-const navMenu = document.querySelector('.nav-menu');
-const navLinks = document.querySelectorAll('.nav-link');
+// ============================================
+// MOBILE NAVIGATION
+// ============================================
+const hamburger = document.querySelector(".hamburger");
+const navMenu = document.querySelector(".nav-menu");
+const navLinks = document.querySelectorAll(".nav-link");
 
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
+// Toggle mobile menu when hamburger is clicked
+hamburger.addEventListener("click", () => {
+  hamburger.classList.toggle("active");
+  navMenu.classList.toggle("active");
 });
 
-// Close mobile menu when clicking on a link
-navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
-    });
+// Close menu when clicking any nav link
+navLinks.forEach((link) => {
+  link.addEventListener("click", () => {
+    hamburger.classList.remove("active");
+    navMenu.classList.remove("active");
+  });
 });
 
-// Smooth scrolling for navigation links
-navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute('href');
-        const targetSection = document.querySelector(targetId);
-        
-        if (targetSection) {
-            const offsetTop = targetSection.offsetTop - 70;
-            window.scrollTo({
-                top: offsetTop,
-                behavior: 'smooth'
-            });
-        }
-    });
-});
+// ============================================
+// SMOOTH SCROLLING
+// ============================================
+navLinks.forEach((link) => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    const targetId = link.getAttribute("href");
+    const targetSection = document.querySelector(targetId);
 
-// Navbar background on scroll
-const navbar = document.querySelector('.navbar');
-let lastScroll = 0;
-
-window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-    
-    if (currentScroll > 100) {
-        navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
-        navbar.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-    } else {
-        navbar.style.backgroundColor = '#ffffff';
-        navbar.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+    if (targetSection) {
+      // Scroll to section with offset for fixed navbar
+      const offsetTop = targetSection.offsetTop - 70;
+      window.scrollTo({
+        top: offsetTop,
+        behavior: "smooth",
+      });
     }
-    
-    lastScroll = currentScroll;
+  });
 });
 
-// Intersection Observer for fade-in animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
+// ============================================
+// NAVBAR SCROLL EFFECTS
+// ============================================
+const navbar = document.querySelector(".navbar");
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, observerOptions);
+window.addEventListener("scroll", () => {
+  const currentScroll = window.pageYOffset;
 
-// Observe elements for animation
-const animateElements = document.querySelectorAll('.project-card, .skill-category, .timeline-item, .highlight-item');
-animateElements.forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(el);
+  // Add shadow and darken navbar when scrolled down
+  if (currentScroll > 100) {
+    navbar.style.backgroundColor = "rgba(0, 0, 0, 0.98)";
+    navbar.style.boxShadow = "0 2px 15px rgba(0, 255, 0, 0.4)";
+  } else {
+    navbar.style.backgroundColor = "rgba(0, 0, 0, 0.95)";
+    navbar.style.boxShadow = "0 2px 10px rgba(0, 255, 0, 0.3)";
+  }
 });
 
-// Active navigation link on scroll
-const sections = document.querySelectorAll('section');
+// ============================================
+// HERO TITLE TYPING EFFECT
+// ============================================
+const heroTitle = document.querySelector(".typing-text");
 
-window.addEventListener('scroll', () => {
-    let current = '';
-    
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        
-        if (window.pageYOffset >= (sectionTop - 100)) {
-            current = section.getAttribute('id');
-        }
-    });
-    
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
-            link.classList.add('active');
-        }
-    });
-});
+if (heroTitle) {
+  const originalText = heroTitle.innerHTML;
+  heroTitle.innerHTML = "";
 
-// Typing effect for hero subtitle (optional enhancement)
-const subtitleElement = document.querySelector('.hero-subtitle');
-if (subtitleElement) {
-    const originalText = subtitleElement.textContent;
-    subtitleElement.textContent = '';
-    
-    let i = 0;
-    const typingSpeed = 50;
-    
-    function typeWriter() {
-        if (i < originalText.length) {
-            subtitleElement.textContent += originalText.charAt(i);
-            i++;
-            setTimeout(typeWriter, typingSpeed);
-        }
+  let i = 0;
+  const typingSpeed = 50;
+  let htmlBuffer = "";
+  let insideTag = false;
+
+  function typeWriter() {
+    if (i < originalText.length) {
+      const char = originalText.charAt(i);
+
+      // Check if we're inside an HTML tag
+      if (char === "<") {
+        insideTag = true;
+      }
+
+      htmlBuffer += char;
+
+      // When tag closes, update the display
+      if (char === ">") {
+        insideTag = false;
+        heroTitle.innerHTML = htmlBuffer;
+      } else if (!insideTag) {
+        heroTitle.innerHTML = htmlBuffer;
+      }
+
+      i++;
+      setTimeout(typeWriter, insideTag ? 0 : typingSpeed);
     }
-    
-    // Start typing effect after page load
-    setTimeout(typeWriter, 500);
+  }
+
+  // Start typing after a short delay
+  setTimeout(typeWriter, 1000);
 }
 
-// Project card hover effect enhancement
-const projectCards = document.querySelectorAll('.project-card');
-projectCards.forEach(card => {
-    card.addEventListener('mouseenter', function() {
-        this.style.borderLeft = '4px solid #2563eb';
-    });
-    
-    card.addEventListener('mouseleave', function() {
-        this.style.borderLeft = 'none';
-    });
+// ============================================
+// SCROLL ANIMATIONS FOR CARDS
+// ============================================
+const observerOptions = {
+  threshold: 0.1,
+  rootMargin: "0px 0px -50px 0px",
+};
+
+// Animate elements when they scroll into view
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = "1";
+      entry.target.style.transform = "translateY(0)";
+    }
+  });
+}, observerOptions);
+
+// Apply animation to these elements
+const animateElements = document.querySelectorAll(
+  ".project-card, .skill-category, .timeline-item, .highlight-item"
+);
+animateElements.forEach((el) => {
+  el.style.opacity = "0";
+  el.style.transform = "translateY(20px)";
+  el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+  observer.observe(el);
 });
 
-// Skill tags random color variation (subtle)
-const skillTags = document.querySelectorAll('.skill-tag');
-const colors = [
-    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
-    'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
-    'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)'
-];
+// ============================================
+// ACTIVE NAVIGATION HIGHLIGHTING
+// ============================================
+const sections = document.querySelectorAll("section");
 
-skillTags.forEach((tag, index) => {
-    const colorIndex = index % colors.length;
-    tag.style.background = colors[colorIndex];
+window.addEventListener("scroll", () => {
+  let current = "";
+
+  // Find which section is currently visible
+  sections.forEach((section) => {
+    const sectionTop = section.offsetTop;
+    if (window.pageYOffset >= sectionTop - 100) {
+      current = section.getAttribute("id");
+    }
+  });
+
+  // Highlight the corresponding nav link
+  navLinks.forEach((link) => {
+    link.classList.remove("active");
+    if (link.getAttribute("href") === `#${current}`) {
+      link.classList.add("active");
+    }
+  });
 });
 
-// Add scroll-to-top button functionality
+// ============================================
+// PROJECT CARD HOVER EFFECT
+// ============================================
+const projectCards = document.querySelectorAll(".project-card");
+
+projectCards.forEach((card) => {
+  // Change border to yellow on hover
+  card.addEventListener("mouseenter", function () {
+    this.style.borderColor = "#ffff00";
+  });
+
+  // Change back to green when not hovering
+  card.addEventListener("mouseleave", function () {
+    this.style.borderColor = "#00ff00";
+  });
+});
+
+// ============================================
+// SCROLL TO TOP BUTTON
+// ============================================
 function createScrollToTop() {
-    const scrollBtn = document.createElement('button');
-    scrollBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-    scrollBtn.className = 'scroll-to-top';
-    scrollBtn.style.cssText = `
+  const scrollBtn = document.createElement("button");
+  scrollBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+  scrollBtn.className = "scroll-to-top";
+  scrollBtn.style.cssText = `
         position: fixed;
         bottom: 30px;
         right: 30px;
         width: 50px;
         height: 50px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
+        border-radius: 4px;
+        background: transparent;
+        color: #00ff00;
+        border: 2px solid #00ff00;
         font-size: 1.2rem;
         cursor: pointer;
         display: none;
         z-index: 999;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
         transition: all 0.3s ease;
     `;
-    
-    document.body.appendChild(scrollBtn);
-    
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 300) {
-            scrollBtn.style.display = 'block';
-        } else {
-            scrollBtn.style.display = 'none';
-        }
+
+  document.body.appendChild(scrollBtn);
+
+  // Show button when scrolled down
+  window.addEventListener("scroll", () => {
+    if (window.pageYOffset > 300) {
+      scrollBtn.style.display = "block";
+    } else {
+      scrollBtn.style.display = "none";
+    }
+  });
+
+  // Scroll to top when clicked
+  scrollBtn.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
     });
-    
-    scrollBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-    
-    scrollBtn.addEventListener('mouseenter', () => {
-        scrollBtn.style.transform = 'scale(1.1)';
-    });
-    
-    scrollBtn.addEventListener('mouseleave', () => {
-        scrollBtn.style.transform = 'scale(1)';
-    });
+  });
+
+  // Hover effects for the button
+  scrollBtn.addEventListener("mouseenter", () => {
+    scrollBtn.style.background = "#00ff00";
+    scrollBtn.style.color = "#000000";
+    scrollBtn.style.boxShadow = "0 0 20px rgba(0, 255, 0, 0.8)";
+  });
+
+  scrollBtn.addEventListener("mouseleave", () => {
+    scrollBtn.style.background = "transparent";
+    scrollBtn.style.color = "#00ff00";
+    scrollBtn.style.boxShadow = "0 0 10px rgba(0, 255, 0, 0.5)";
+  });
 }
 
-// Initialize scroll to top button
+// Initialize the scroll to top button
 createScrollToTop();
 
-// Loading animation
-window.addEventListener('load', () => {
-    document.body.style.opacity = '0';
-    setTimeout(() => {
-        document.body.style.transition = 'opacity 0.5s ease';
-        document.body.style.opacity = '1';
-    }, 100);
+// ============================================
+// TERMINAL WINDOW HOVER GLOW
+// ============================================
+const terminalWindows = document.querySelectorAll(".terminal-window");
+
+terminalWindows.forEach((window) => {
+  // Increase glow on hover
+  window.addEventListener("mouseenter", function () {
+    this.style.boxShadow =
+      "0 0 40px rgba(0, 255, 0, 0.6), inset 0 0 50px rgba(0, 255, 0, 0.1)";
+  });
+
+  // Return to normal glow
+  window.addEventListener("mouseleave", function () {
+    this.style.boxShadow =
+      "0 0 30px rgba(0, 255, 0, 0.4), inset 0 0 50px rgba(0, 255, 0, 0.05)";
+  });
 });
 
-// Copy email to clipboard functionality
-const emailLinks = document.querySelectorAll('a[href^="mailto:"]');
-emailLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        const email = link.getAttribute('href').replace('mailto:', '');
-        
-        // Create tooltip
-        const tooltip = document.createElement('div');
-        tooltip.textContent = 'Email copied!';
-        tooltip.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #10b981;
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            z-index: 9999;
-            animation: fadeInOut 2s ease;
-        `;
-        
-        document.body.appendChild(tooltip);
-        
-        // Copy to clipboard
-        navigator.clipboard.writeText(email).then(() => {
-            setTimeout(() => {
-                tooltip.remove();
-            }, 2000);
-        });
-    });
-});
-
-// Add CSS animation for tooltip
-const style = document.createElement('style');
+// ============================================
+// ACTIVE NAV LINK STYLING
+// ============================================
+const style = document.createElement("style");
 style.textContent = `
-    @keyframes fadeInOut {
-        0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-        10%, 90% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    }
-    
     .nav-link.active {
-        color: #2563eb;
+        color: #ffff00 !important;
+        text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
     }
 `;
 document.head.appendChild(style);
-
-console.log('Portfolio loaded successfully! 🚀');
